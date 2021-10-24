@@ -1,5 +1,5 @@
 from .base_page import BasePage
-from .locators import LoginPageLocators
+from .locators import *
 
 
 class LoginPage(BasePage):
@@ -25,4 +25,4 @@ class LoginPage(BasePage):
             self.is_element_present(*LoginPageLocators.registration_button), "Не найдена форма регистрации!"
 
     def click_login_link(self):
-        self.browser.find_element(*LoginPageLocators.LOGIN_LINK).click()
+        self.browser.find_element(*MainPageLocators.LOGIN_LINK).click()
