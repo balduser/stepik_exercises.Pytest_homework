@@ -26,3 +26,11 @@ class ProductPage(BasePage):
 
     def book_name_in_basket(self):
         return self.browser.find_element(*ProductPageLocators.book_name_in_basket).text
+
+    def should_not_be_success_message(self):
+        assert self.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Success message is presented, but should not be"
+
+    def success_message_should_disappear(self):
+        assert self.is_disappeared(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Didn't notice that success message disappears"
