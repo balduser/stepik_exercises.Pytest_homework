@@ -14,6 +14,7 @@ def browser(request):
     language = request.config.getoption("language")
     options = Options()
     options.add_experimental_option('prefs', {'intl.accept_languages': language})
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])  # To exclude redundant info
     browser = webdriver.Chrome(options=options)
     yield browser
     print("\nclosing browser...")
