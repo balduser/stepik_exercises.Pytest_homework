@@ -34,6 +34,8 @@ class MainPageLocators:
 
 class ProductPageLocators:
     add_to_basket_button = (By.CSS_SELECTOR, 'button.btn-add-to-basket')
-    book_name_locator = (By.CSS_SELECTOR, 'div.product_main h1')
+    book_name = (By.CSS_SELECTOR, 'div.product_main h1')
+    book_price = (By.CSS_SELECTOR, 'div.product_main p.price_color')
     book_name_in_basket = (By.CSS_SELECTOR, 'div.alertinner strong')
+    book_price_in_basket = (By.CSS_SELECTOR, 'div.basket-items p.price_color')
     SUCCESS_MESSAGE = (By.CSS_SELECTOR, 'div.alert-success')

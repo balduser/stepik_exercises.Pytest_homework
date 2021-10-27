@@ -1,40 +1,41 @@
 import pytest
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from pages.locators import LoginPageLocators
 from pages.login_page import LoginPage
 from pages.product_page import ProductPage
 from pages.basket_page import BasketPage
 
 link_1 = 'http://selenium1py.pythonanywhere.com/catalogue/the-shellcoders-handbook_209/?promo=newYear'
 link = 'http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/'
-links = [f"http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer{n}" for n in range(10)]
+# В тесте test_guest_can_add_product_to_basket() у нас выпадает ошибка на offer=7, её необходимо
+# отметить x_fail. Ссылки для остальных тестов получаем генератором списков.
+links = [f"http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer{n}"
+    if n != 7 else pytest.param(
+    "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer7",
+    marks=pytest.mark.xfail) for n in range(10)]
 
 @pytest.mark.user
 class TestUserAddToBasketFromProductPage:
     @pytest.fixture(scope="function", autouse=True)
-    def setup(self):
-        options = Options()
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])  # To exclude redundant info
-        self.browser = webdriver.Chrome(options=options)
-        self.page = LoginPage(self.browser, link)
+    def setup(self, browser):
+        self.page = LoginPage(browser, LoginPageLocators.registration_url)
         self.page.open()
-        self.page.click_login_link()
+#        self.page.click_login_link()
         email = str(time.time()) + "@fakemail.org"
-        self.page.register_new_user(email, "biba+boba=He110nE@rth")
+        self.page.register_new_user(email, "biba+boba=Hell0nE@rth")
         self.page.should_be_authorized_user()
 
-    def test_user_cant_see_success_message(self):
+    def test_user_cant_see_success_message(self, browser):
         """Проверяет, что при открытии юзером страницы продукта сообщение об
         успешном добавлении не появляется"""
-        self.page = ProductPage(self.browser, link)
+        self.page = ProductPage(browser, link)
         self.page.open()
         self.page.should_not_be_success_message()
 
     @pytest.mark.need_review
-    def test_user_can_add_product_to_basket(self):
+    def test_user_can_add_product_to_basket(self, browser):
         """Проверяет, что название книги в каталоге соответствует названию в корзине"""
-        self.page = ProductPage(self.browser, link)
+        self.page = ProductPage(browser, link)
         self.page.open()
         self.page.add_to_basket_and_check_name()
 
@@ -56,7 +57,8 @@ def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     page.basket_is_empty_by_text()
 
 @pytest.mark.need_review
-def test_guest_can_add_product_to_basket(browser):
+@pytest.mark.parametrize('link', links)
+def test_guest_can_add_product_to_basket(browser, link):
     """Проверяет, что название книги в каталоге соответствует названию в корзине"""
     page = ProductPage(browser, link)
     page.open()
@@ -71,6 +73,13 @@ def test_guest_cant_see_success_message_after_adding_product_to_basket(browser):
     page.open()
     page.add_to_basket()
     page.solve_quiz_and_get_code()
+    page.should_not_be_success_message()
+
+def test_guest_cant_see_success_message(browser):
+    """Проверяет, что при открытии юзером страницы продукта сообщение об
+    успешном добавлении не появляется"""
+    page = ProductPage(browser, link)
+    page.open()
     page.should_not_be_success_message()
 
 @pytest.mark.basket
@@ -90,13 +99,6 @@ def test_guest_should_see_login_link_on_product_page(browser):
     page = ProductPage(browser, link)
     page.open()
     page.should_be_login_link()
-
-def test_guest_cant_see_success_message(browser):
-    """Проверяет, что при открытии юзером страницы продукта сообщение об
-    успешном добавлении не появляется"""
-    page = ProductPage(browser, link)
-    page.open()
-    page.should_not_be_success_message()
 
 def test_user_can_log_in(browser):
     page = LoginPage(browser, link)
