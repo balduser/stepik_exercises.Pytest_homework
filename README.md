@@ -1,5 +1,5 @@
 # stepik_exercises.Pytest_homework
-Yet another stepik homework
+![Certificate](https://github.com/balduser/stepik_exercises.Pytest_homework/blob/master/certificate.png)
 
 My environment:  
 Windows 10  
